@@ -6,7 +6,7 @@
  * - 写真が幕を開けるように出る・ゆっくり動く（パララックス）
  * - 流れる文字の帯（.mq）：スクロールの速さ・向きで加速・反転
  * - 画面を止めて横に流れる推しポイント（data-hscroll）
- * - 数字のカウントアップ・施工前後スライダー・ヘッダーの出し入れ
+ * - 数字のカウントアップ・施工前後スライダー・ヘッダーの出し入れ・右下の応募/相談ボタン
  * ?shot=1（スクリーンショット用）や「動きを減らす」設定のときは動かさない。
  */
 (function () {
@@ -79,6 +79,8 @@
         }, { rootMargin: '0px 0px -8% 0px' });
         $$('.rv').forEach(function (el) { io.observe(el); });
         root.classList.add('mq-css');
+        var fc0 = d.querySelector('.float-cta');
+        if (fc0) W.addEventListener('scroll', function () { fc0.classList.toggle('show', W.scrollY > W.innerHeight * 0.7); }, { passive: true });
       } else lite();
       return;
     }
@@ -176,10 +178,11 @@
     });
 
     /* ヘッダー：下にスクロールで隠れ、上で出る */
-    var hd = d.querySelector('.site-header'), last = 0;
+    var hd = d.querySelector('.site-header'), fc = d.querySelector('.float-cta'), last = 0;
     ST.create({ start: 0, end: 'max', onUpdate: function (s) {
       var y = s.scroll();
       if (hd) { hd.classList.toggle('scrolled', y > 40); hd.classList.toggle('hide', y > 300 && y > last && !(tg && tg.checked)); }
+      if (fc) fc.classList.toggle('show', y > W.innerHeight * 0.7);
       last = y;
     } });
 
