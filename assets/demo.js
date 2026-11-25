@@ -102,7 +102,16 @@
       var h1 = hero.querySelector('[data-split]');
       var tl = gsap.timeline({ delay: 0.15 });
       if (h1) tl.from(split(h1, 'ch'), { yPercent: 115, rotate: 8, duration: 1.1, ease: 'expo.out', stagger: 0.035 });
-      tl.from(hero.querySelectorAll('.hero-en, .hero-lead, .hero-btns, .page-head .en, .page-head-in > p'), { y: 24, opacity: 0, duration: 0.9, ease: 'power3.out', stagger: 0.08 }, '-=0.7');
+      tl.from(hero.querySelectorAll('.hero-script, .hero-en, .hero-lead, .hero-btns, .hero-badges, .page-head .en, .page-head-in > p'), { y: 24, opacity: 0, duration: 0.9, ease: 'power3.out', stagger: 0.08 }, '-=0.7');
+      // やわらか系：写真・丸バッジがふわっと出て、スクロールで少しずつずれる
+      var vis = hero.querySelectorAll('.hero-photo, .hero-photo2, .ring');
+      if (vis.length) {
+        tl.from(vis, { scale: 0.82, opacity: 0, duration: 1.4, ease: 'expo.out', stagger: 0.15 }, 0.1);
+        [['.hero-photo', -6], ['.hero-photo2', -22], ['.ring', -34], ['.blob-1', 18], ['.blob-2', -14], ['.blob-3', 24]].forEach(function (x) {
+          var el = hero.querySelector(x[0]);
+          if (el) gsap.to(el, { yPercent: x[1], ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: true } });
+        });
+      }
       var bg = hero.querySelector('.hero-bg img, .page-head-bg img');
       if (bg) gsap.fromTo(bg, { scale: 1.18 }, { scale: 1, yPercent: 12, ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: true } });
       var inner = hero.querySelector('.hero-in');
