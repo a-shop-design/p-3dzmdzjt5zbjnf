@@ -4,8 +4,8 @@
  * - 会社紹介の写真：スクロールに合わせて画面いっぱいに広がり、白黒からカラーになる
  * - 番号つきの強み：見ている項目に合わせて左の番号と見出しが切り替わる／写真が自動で切り替わる
  * - 写真の壁：スクロールで列が左右にずれる
- * - 応募ゾーン：コピーが止まったまま暗転 → 写真の3列が縮小しながら上下に動く → 見出しと入口3つが出る
- * - ヘッダー：スクロールでロゴが小さくなる／メニューはリンクを押すと閉じる／応募ゾーンでは隠れる
+ * - 応募ゾーンの動きは demo-cta.js（全部の型で共通）
+ * - ヘッダー：スクロールでロゴが小さくなる／メニューはリンクを押すと閉じる
  */
 (function () {
   var d = document, W = window, root = d.documentElement;
@@ -62,40 +62,10 @@
   var pts = $$('.st-point'), numCol = d.querySelector('.st-num-col'), labels = $$('.st-points-labels span');
   var hd = d.querySelector('.st-header');
   var curPt = -1, ticking = false;
-  // 応募ゾーン
-  var ctas = $$('[data-stcta]').map(function (el) {
-    return { el: el, main: el.querySelector('.st-cta-main'), inner: el.querySelector('.st-cta-inner'), sticky: el.querySelector('.st-cta-imgs-sticky'), col: el.querySelector('.st-col'), items: el.querySelector('.st-cta-items') };
-  });
-  function ctaStep(c, vh, mobile) {
-    var er = c.el.getBoundingClientRect();
-    // ① コピーが画面に入ったら、文字と写真が出る
-    if (er.top < vh * 0.5 && er.bottom > 0) c.el.classList.add('is-inview');
-    else if (er.top >= vh * 0.6) c.el.classList.remove('is-inview');
-    // ② コピーが止まったあと、スクロールに合わせて暗転
-    var mr = c.main.getBoundingClientRect();
-    var opa = still ? 1 : clamp(-mr.top / (vh * 0.8), 0, 1);
-    c.main.style.setProperty('--opa', opa.toFixed(3));
-    c.el.classList.toggle('is-bg-show', opa >= 0.98);
-    root.classList.toggle('st-hd-hide', opa > 0.4 && er.bottom > vh * 0.5);
-    // ③ 写真の3列：縮小しながら、1・3列目は上へ、2列目は下へ
-    var ir = c.inner.getBoundingClientRect();
-    var q = still ? 0.5 : clamp(-ir.top / Math.max(1, ir.height - vh), 0, 1);
-    var s0 = mobile ? 1.35 : 1.5;
-    var colH = c.col ? c.col.offsetHeight : vh * 2;
-    var M = Math.max(0, Math.min(colH - vh, colH * 0.5) * 0.9);
-    c.sticky.style.setProperty('--scale', (s0 - (s0 - 1) * q).toFixed(4));
-    c.sticky.style.setProperty('--moveY', (-M * q).toFixed(1) + 'px');
-    c.sticky.style.setProperty('--moveYr', (M * q).toFixed(1) + 'px');
-    // ④ 見出しと入口3つ
-    var tr = c.items.getBoundingClientRect();
-    if (still || (tr.top < vh * 0.2 && tr.bottom > vh * 0.4)) c.el.classList.add('is-show');
-    else if (tr.top > vh * 0.45) c.el.classList.remove('is-show');
-  }
   function onScroll() {
     ticking = false;
     var vh = W.innerHeight, vw = root.clientWidth, y = W.scrollY;
     if (hd) hd.classList.toggle('is-scrolled', y > 80);
-    ctas.forEach(function (c) { ctaStep(c, vh, vw < 768); });
     if (grow && gImg) {
       var r = grow.getBoundingClientRect();
       var p = still ? 1 : ease(clamp(-r.top / Math.max(1, r.height - vh), 0, 1));
